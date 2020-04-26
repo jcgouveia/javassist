@@ -41,6 +41,10 @@
     </license>
   </licenses>
 
+	<properties>
+		<java.home>C:\Program Files\Java\jdk1.8.0_144\bin</java.home>
+	</properties>
+	
   <scm>
     <connection>scm:git:git@github.com:jboss-javassist/javassist.git</connection>
     <developerConnection>scm:git:git@github.com:jboss-javassist/javassist.git</developerConnection>
@@ -143,8 +147,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <testSource>1.9</testSource>
           <testTarget>1.9</testTarget>
           <testCompilerArgument>-parameters</testCompilerArgument>
