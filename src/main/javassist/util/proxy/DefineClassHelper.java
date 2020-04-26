@@ -105,8 +105,9 @@ public class DefineClassHelper {
     {
         try {
             Lookup lookup = MethodHandles.lookup();
-            lookup = lookup.dropLookupMode(java.lang.invoke.MethodHandles.Lookup.PRIVATE);
-            return lookup.defineClass(bcode);
+//            lookup = lookup.dropLookupMode(java.lang.invoke.MethodHandles.Lookup.PRIVATE);
+//            return lookup.defineClass(bcode);
+            return null;
         }
         catch (Throwable t) {
             throw new CannotCompileException(t);
