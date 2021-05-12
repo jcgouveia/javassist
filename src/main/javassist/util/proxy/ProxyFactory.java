@@ -995,6 +995,11 @@ public class ProxyFactory {
 
     private void computeSignature(MethodFilter filter) // throws CannotCompileException
     {
+    	//Morphis - cache extension
+    	boolean exists = recoverInfo();
+    	if ( exists )
+    		return;
+    	
         makeSortedMethodList();
 
         int l = signatureMethods.size();
@@ -1009,6 +1014,9 @@ public class ProxyFactory {
                 setBit(signature, idx);
             }
         }
+        
+      //Morphis - cache extension
+        storeInfo();
     }
 
     private void installSignature(byte[] signature) // throws CannotCompileException
@@ -1640,5 +1648,91 @@ public class ProxyFactory {
         code.addOpcode(Opcode.ARETURN);
         minfo.setCodeAttribute(code.toCodeAttribute());
         return minfo;
+    }
+    
+    /***
+     * Morphis Extension
+     */
+    static HashMap<Class<?>, ClassInfo> infoStorage = new HashMap<>();
+    
+    /***
+     * Morphis Extension
+     */
+    private void storeInfo() {
+    	Class<?> c = this.superClass;
+    	
+    	if ( infoStorage.containsKey(c) )
+    		return;
+    	
+    	ClassInfo info = new ClassInfo();
+    	info.superClass = this.superClass;
+    	info.classname = this.classname;
+    	info.basename = this.basename;
+    	info.signatureMethods = new ArrayList<Method>();
+    	info.signatureMethods.addAll(this.signatureMethods);
+    	info.signature = this.signature;
+    	info.interfaces = this.interfaces;
+    	
+    	infoStorage.put(c, info);
+    }
+    
+    /***
+     * Morphis Extension
+     */
+    private boolean recoverInfo() {
+    	Class<?> c = this.superClass;
+    	
+    	if ( infoStorage.containsKey(c) ) {
+    		ClassInfo info = infoStorage.get(c);
+    		
+    		this.signature = info.signature;
+    		this.signatureMethods = info.signatureMethods;
+    		this.interfaces = info.interfaces;
+    		//more ???
+    		
+    		return true;
+    	}
+    	else
+    		return false;
+    }
+    
+    /***
+     * Morphis Extension
+     */
+    public String getStoredKey(Class superClass, Class[] interfaces, byte[] signature, boolean useWriteReplace)
+    {
+    	if ( infoStorage.containsKey(superClass) ) {
+    		ClassInfo info = infoStorage.get(superClass);
+    		
+    		if ( info.key != null )
+    			return info.key;
+    	}
+    	String key = getKey(superClass, interfaces, signature, useWriteReplace);
+    	
+    	//store (just in case it was not yet stored
+    	storeInfo();
+    	ClassInfo info = infoStorage.get(superClass);
+    	info.key = key;
+    	
+    	return key;
+    }
+    
+
+    
+
+    
+    static class ClassInfo {
+        private Class superClass;
+        private Class[] interfaces;
+        //private MethodFilter methodFilter;
+
+        private List signatureMethods;
+        //private boolean hasGetHandler;
+        private byte[] signature;
+        private String classname;
+        private String basename;
+        private String superName;
+        
+        private String key;
     }
 }
